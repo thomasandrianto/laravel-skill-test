@@ -53,4 +53,41 @@ class PostController extends Controller
             'data' => $post,
         ], 201);
     }
+
+    public function edit(Post $post)
+    {
+        abort_unless($post->user_id === auth()->id(), 403);
+
+        return 'posts.edit';
+    }
+
+    public function update(Request $request, Post $post)
+    {
+        abort_unless($post->user_id === auth()->id(), 403);
+
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'published_at' => ['nullable', 'date'],
+            'is_draft' => ['boolean'],
+        ]);
+
+        $post->update($validated);
+
+        return response()->json([
+            'message' => 'Post updated successfully',
+            'data' => $post->fresh(),
+        ]);
+    }
+
+    public function destroy(Post $post)
+    {
+        abort_unless($post->user_id === auth()->id(), 403);
+
+        $post->delete();
+
+        return response()->json([
+            'message' => 'Post deleted successfully',
+        ]);
+    }
 }
