@@ -23,4 +23,11 @@ class Post extends Model
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now());
     }
+
+    public function isPublished(): bool
+    {
+        return ! $this->is_draft
+            && $this->published_at !== null
+            && $this->published_at <= now();
+    }
 }

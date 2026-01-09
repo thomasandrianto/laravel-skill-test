@@ -16,4 +16,13 @@ class PostController extends Controller
 
         return PostResource::collection($posts);
     }
+
+    public function show(Post $post)
+    {
+        abort_unless($post->isPublished(), 404);
+
+        return new PostResource(
+            $post->load('user')
+        );
+    }
 }
