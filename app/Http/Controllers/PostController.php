@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
@@ -24,5 +25,32 @@ class PostController extends Controller
         return new PostResource(
             $post->load('user')
         );
+    }
+
+    public function create()
+    {
+        return 'posts.create';
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'published_at' => ['nullable', 'date'],
+            'is_draft' => ['boolean'],
+        ]);
+
+        $post = $request->user()->posts()->create([
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'is_draft' => $validated['is_draft'] ?? true,
+            'published_at' => $validated['published_at'] ?? null,
+        ]);
+
+        return response()->json([
+            'message' => 'Post created successfully',
+            'data' => $post,
+        ], 201);
     }
 }
