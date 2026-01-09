@@ -56,14 +56,14 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
-        abort_unless($post->user_id === auth()->id(), 403);
+        $this->authorize('update', $post);
 
         return 'posts.edit';
     }
 
     public function update(Request $request, Post $post)
     {
-        abort_unless($post->user_id === auth()->id(), 403);
+        $this->authorize('update', $post);
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -76,13 +76,13 @@ class PostController extends Controller
 
         return response()->json([
             'message' => 'Post updated successfully',
-            'data' => $post->fresh(),
+            'data' => $post,
         ]);
     }
 
     public function destroy(Post $post)
     {
-        abort_unless($post->user_id === auth()->id(), 403);
+        $this->authorize('delete', $post);
 
         $post->delete();
 
